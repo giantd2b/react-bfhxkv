@@ -31,8 +31,8 @@ function App() {
   };
 
   const runApp = () => {
-    const idToken = liff.getIDToken();
-    setIdToken(idToken);
+    //const idToken = liff.getIDToken();
+    //setIdToken(idToken);
     liff
       .getProfile()
       .then(profile => {
@@ -65,7 +65,8 @@ function App() {
               wordBreak: "break-all"
             }}
           >
-            <b>id token: </b> {idToken}
+            <b>แต้มสะสม: </b> {idToken}
+            <b> 0 แต้ม</b> {idToken}
           </p>
           <p
             style={{
@@ -75,7 +76,7 @@ function App() {
               wordBreak: "break-all"
             }}
           >
-            <b>display name: </b> {displayName}
+            <b>ชื่อสมาชิก: </b> {displayName}
           </p>
           <p
             style={{
@@ -95,7 +96,7 @@ function App() {
               wordBreak: "break-all"
             }}
           >
-            <b>user id: </b> {userId}
+            <b> รหัสสมาชิก: </b> {userId}
           </p>
           <p
             style={{
