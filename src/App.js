@@ -9,9 +9,10 @@ function App() {
   const [idToken, setIdToken] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState([]);
   const [email, setEmail] = useState("");
   const [memberPoint, setmemberPoint] = useState("");
+
   const logout = () => {
     liff.logout();
     window.location.reload();
@@ -32,111 +33,69 @@ function App() {
   };
 
   const runApp = () => {
-    //const idToken = liff.getIDToken();
-    //setIdToken(idToken);
     liff
       .getProfile()
       .then(profile => {
-        const obj = profile;
         const mpoint = "";
-        obj.emailId = liff.getDecodedIDToken().email;
-        obj.memberPoint = mpoint;
+        profile.emailId = liff.getDecodedIDToken().email;
+        profile.memberPoint = mpoint;
+        console.log(profile);
 
-        const addUserHandler = obj => {
-          //const id = "myID#"+Math.random(999).toString();
-          const ref = firestore.collection("users").doc(obj.userId);
-
-          //console.log(obj.userId);
-
+        //const addUserHandler =//
+        const addUserHandler = profile => {
+          const ref = firestore.collection("users").doc(profile.userId);
+          console.log(ref.id);
           ref.get().then(doc => {
             if (!doc.data()) {
               ref
-                //.doc(id)
-                .set(obj)
+                .set(profile)
                 .then(() => {
                   console.log("add success");
-
-                  const obj2 = obj;
-
-                  async function getuserProfile() {
-                    const userRef = firestore
-                      .collection("users")
-                      .doc(obj2.userId);
-
-                    const doc2 = await userRef.get();
-                    setDisplayName(doc2.data().displayName);
-                    setPictureUrl(doc2.data().pictureUrl);
-                    setStatusMessage(doc2.data().statusMessage);
-                    setUserId(doc2.data().userId);
-                    setEmail(doc2.data().emailId);
-                    setmemberPoint(doc2.data().memberPoint);
-
-                    console.log(doc2.data());
-                    return doc2;
-                  }
                   getuserProfile();
                 })
                 .catch(err => console.log(err));
             } else {
               console.log("มีผู้ใช้นี้แล้ว");
-
-              const obj2 = obj;
-
-              async function getuserProfile() {
-                const userRef = firestore.collection("users").doc(obj2.userId);
-
-                const doc2 = await userRef.get();
-                setDisplayName(doc2.data().displayName);
-                setPictureUrl(doc2.data().pictureUrl);
-                setStatusMessage(doc2.data().statusMessage);
-                setUserId(doc2.data().userId);
-                setEmail(doc2.data().emailId);
-
-                const userRef2 = firestore.collection("users");
-                userRef2.onSnapshot(
-                  snapshot => {
-                    snapshot.forEach(doc => {
-                      let point = doc.data().memberPoint;
-                      setmemberPoint(point);
-                    });
-                  },
-                  err => {
-                    console.log(err);
-                  }
-                );
-                //setmemberPoint(doc2.data().memberPoint);
-
-                //console.log(doc2.data());
-              }
               getuserProfile();
             }
           });
         };
-        addUserHandler(obj);
 
-        // async function getuserProfile () {
-        //   const userRef = firestore.collection("users").doc(obj2.userId);
+        addUserHandler(profile);
 
-        //   const doc2 = await userRef.get();
-        //   setDisplayName(doc2.data().displayName);
-        //   setPictureUrl(doc2.data().pictureUrl);
-        //   setStatusMessage(doc2.data().statusMessage);
-        //   setUserId(doc2.data().userId);
-        //   setEmail(doc2.data().emailId);
+        async function getuserProfile() {
+          const userRef = firestore.collection("users").doc(profile.userId);
+          const doc = await userRef.get();
+          setDisplayName(doc.data().displayName);
+          setPictureUrl(doc.data().pictureUrl);
+          setStatusMessage(doc.data().statusMessage);
+          setUserId(doc.data().userId);
+          setEmail(doc.data().emailId);
+          setmemberPoint(doc.data().memberPoint);
+        }
 
-        //   if (!doc2.exists) {
-        //     console.log('No such document!');
-        //   } else {
-
-        //     console.log('Document data:', doc2.data().emailId);
-        //   }
-        // }
-        // getuserProfile ();
-        return obj;
+        console.log(profile);
       })
 
       .catch(err => console.error(err));
   };
+  const sendMessages = () => {
+    liff
+      .sendMessages([
+        {
+          type: "text",
+          text: "Hello, World!"
+        }
+      ])
+      .then(() => {
+        console.log("message sent");
+      })
+      .catch(err => {
+        console.log("error", err);
+      });
+  };
+  sendMessages();
+
 
   useEffect(() => {
     initLine();
